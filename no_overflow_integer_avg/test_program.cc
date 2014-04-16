@@ -15,7 +15,7 @@ int main(int argc, char ** argv) {
 	int val1 = INT_MAX - 5000;  // Suitably big number, close to limits.
 	int val2 = val1 + 2;
 
-	int avg = val1 + val2 / 2;
+	int avg = (val1 + val2) / 2;
 
 	assert(avg != val1 + 1);
 	std::cout << "Average didn't compute correctly." << std::endl;
