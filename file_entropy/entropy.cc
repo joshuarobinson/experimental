@@ -3,47 +3,65 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <vector>
+#include <fstream>
+#include <iostream>
+#include <array>
 
-using std::vector;
+// Calculate entry over the bytes in a file.
+double GetByteEntropy(const std::string& filename)
+{
+    std::ifstream in_f(filename, std::ifstream::in | std::ifstream::binary);
+
+    if (!in_f) {
+        std::cerr << "Error, unable to open input file " << filename << std::endl;
+        return 0.0;  // Error condition? This seems awkward.
+    }
+
+    const size_t k_domain_bytes = sizeof(uint8_t);
+    const size_t k_domain_max = 1 << (k_domain_bytes * 8);
+
+    std::array<int, k_domain_max> byte_counters;
+    std::fill(byte_counters.begin(), byte_counters.end(), 0);
+
+    // Now calculate the p(x) probabilities of each possible byte (0-255).
+    int total_bytes = 0;
+    while (in_f) {
+        uint8_t x;
+        in_f >> x;
+
+        byte_counters.at(x)++;
+        total_bytes++;
+    }
+
+    // Now calculate the entropy value.
+    double h = 0.0;  // Entropy
+    for (const int& byte_counter : byte_counters) {
+        // Avoid the inf value returned by log(0.0).
+        if (byte_counter > 0) {
+            double p_i  = static_cast<double>(byte_counter) / total_bytes;
+
+            h -= p_i * (log(p_i) / log(2.0));
+        }
+    }
+
+    return h;
+}
 
 int main(int argc, char* argv[])
 {
-    //check command line arguments
+    // Check command line arguments.
     if (argc < 2) {
-        fprintf(stderr, "Error, program usage: %s [inputfilename]\n", argv[0]);
+        std::cerr << "Error, program usage: " << argv[0] << " [inputfilenames...]" << std::endl;
         exit(1);
     }
 
-    //loop over all the command line inputs
+    // Loop over all the command line inputs, open each file and calculate it's entropy.
     for (int argnum = 1; argnum < argc; ++argnum) {
-        //open the input file
-        FILE* fp;  //pointer to file we will read in
-        if ((fp = fopen(argv[argnum], "r"))==NULL) {
-            fprintf(stderr, "Error, unable to open input file %s\n", argv[1]);
-            continue; //gracefully skip over this bad filename
-        }
+        const std::string filename(argv[argnum]);
+        double h = GetByteEntropy(filename);
 
-        int a;  //storage for the current data characer
-        vector<int> byte_counters(256, 0);
-        int total_bytes = 0;
-        //now calculate the p(x) probabilities of each possible byte (0-255)
-        while ((a = fgetc(fp))!=EOF) {
-            byte_counters[a]++;
-            total_bytes++;
-        }
-        fclose(fp); //finished with the input file
-
-        //now calculate the entropy value
-        double h = 0.0;  //entropy
-        for (const int& byte_counter : byte_counters) {
-            double p_i  = (double)byte_counter / total_bytes;
-            if (p_i > 0.0) {
-                //avoid the inf value returned by log(0.0)
-                h -= p_i * (log(p_i) / log(2));
-            }
-        }
-        printf("%s:\t%g\n", argv[argnum], h);  //output our entropy value for the file
+        // Output our entropy value for the file.
+        std::cout << filename << "\t" << h << std::endl;
     }
 
     return 0;
