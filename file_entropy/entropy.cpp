@@ -1,11 +1,10 @@
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
+#include <array>
+#include <cmath>
 #include <fstream>
 #include <iostream>
-#include <array>
+
+
+const int BadFilenameException = 10;
 
 // Calculate entry over the bytes in a file.
 double GetByteEntropy(const std::string& filename)
@@ -13,8 +12,7 @@ double GetByteEntropy(const std::string& filename)
     std::ifstream in_f(filename, std::ifstream::in | std::ifstream::binary);
 
     if (!in_f) {
-        std::cerr << "Error, unable to open input file " << filename << std::endl;
-        return 0.0;  // Error condition? This seems awkward.
+        throw BadFilenameException;
     }
 
     const size_t k_domain_bytes = sizeof(uint8_t);
@@ -58,10 +56,15 @@ int main(int argc, char* argv[])
     // Loop over all the command line inputs, open each file and calculate it's entropy.
     for (int argnum = 1; argnum < argc; ++argnum) {
         const std::string filename(argv[argnum]);
-        double h = GetByteEntropy(filename);
 
-        // Output our entropy value for the file.
-        std::cout << filename << "\t" << h << std::endl;
+        try {
+            double h = GetByteEntropy(filename);
+
+            // Output our entropy value for the file.
+            std::cout << filename << "\t" << h << std::endl;
+        } catch (int i) {
+            std::cerr << "Error " << i << ", unable to open input file " << filename << std::endl;
+        }
     }
 
     return 0;
