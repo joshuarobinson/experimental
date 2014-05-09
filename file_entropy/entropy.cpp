@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <array>
 #include <cmath>
 #include <fstream>
@@ -31,16 +32,19 @@ double GetByteEntropy(const std::string& filename)
         total_bytes++;
     }
 
-    // Now calculate the entropy value.
     double h = 0.0;  // Entropy
-    for (const int& byte_counter : byte_counters) {
-        // Avoid the inf value returned by log(0.0).
-        if (byte_counter > 0) {
-            double p_i  = static_cast<double>(byte_counter) / total_bytes;
+
+    // Calculate the entropy with this lambda.
+    auto calc_entropy_f = [&](int x) {
+        if (x > 0) {
+            double p_i  = static_cast<double>(x) / total_bytes;
 
             h -= p_i * (log(p_i) / log(2.0));
         }
-    }
+    };
+
+    // Do calculation.
+    std::for_each(byte_counters.begin(), byte_counters.end(), calc_entropy_f);
 
     return h;
 }
