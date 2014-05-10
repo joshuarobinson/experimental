@@ -18,8 +18,9 @@ def get_byte_entropy(filename):
 
             # Calculate entropy.
             entropy = 0.0
-            for byte in byte_counters:
-                p_i = byte_counters[byte] / len(contents)
+            # Iterate over values, ignoring the keys.
+            for counts in byte_counters.values():
+                p_i = counts / len(contents)
                 entropy -= p_i * math.log(p_i, 2)
 
             return round(entropy, 5)  # Round to five decimal places.
