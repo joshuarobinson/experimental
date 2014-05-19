@@ -16,10 +16,7 @@ double GetByteEntropy(const std::string& filename)
         throw BadFilenameException;
     }
 
-    const size_t k_domain_bytes = sizeof(uint8_t);
-    const size_t k_domain_max = 1 << (k_domain_bytes * 8);
-
-    std::array<int, k_domain_max> byte_counters;
+    std::array<int, 256> byte_counters;
     std::fill(byte_counters.begin(), byte_counters.end(), 0);
 
     // Now calculate the p(x) probabilities of each possible byte (0-255).
