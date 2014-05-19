@@ -1,10 +1,9 @@
 package main
 
-import ("bytes"
+import (
 	"fmt"
 	"math"
 	"os"
-	"strconv"
 	"io/ioutil" )
 
 func getByteEntropy(filename string) float64 {
@@ -29,10 +28,6 @@ func getByteEntropy(filename string) float64 {
 
 func main() {
 	for _, element := range os.Args[1:] {
-		var buffer bytes.Buffer
-		buffer.WriteString(element)
-		buffer.WriteString("\t")
-		buffer.WriteString(strconv.FormatFloat(getByteEntropy(element), 'f', 6, 64))
-		fmt.Println(buffer.String())
+		fmt.Printf("%s\t%f\n", element, getByteEntropy(element))
 	}
 }
