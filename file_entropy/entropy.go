@@ -6,10 +6,10 @@ import (
 	"os"
 	"io/ioutil" )
 
-func getByteEntropy(filename string) float64 {
+func getByteEntropy(filename string) (float64, error) {
 	bs, err := ioutil.ReadFile(filename)
 	if err != nil {
-		return 0.0
+		return 0.0, err
 	}
 
 	byte_counters := make(map[byte]int)
@@ -23,11 +23,14 @@ func getByteEntropy(filename string) float64 {
 		entropy -= p_i * math.Log2(p_i)
 	}
 
-	return entropy
+	return entropy, nil
 }
 
 func main() {
 	for _, element := range os.Args[1:] {
-		fmt.Printf("%s\t%f\n", element, getByteEntropy(element))
+		entropy, err := getByteEntropy(element)
+		if err == nil {
+			fmt.Printf("%s\t%f\n", element, entropy)
+		}
 	}
 }
