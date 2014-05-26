@@ -47,12 +47,6 @@ int get_byte_entropy(const char * filename, double * answer)
 
 int main(int argc, char* argv[])
 {
-    // Check command line arguments.
-    if (argc < 2) {
-        fprintf(stderr, "Error, program usage: %s [inputfilenames...]\n", argv[0]);
-        exit(1);
-    }
-
     // Loop over all the command line inputs, open each file and calculate it's entropy.
     for (int argnum = 1; argnum < argc; ++argnum) {
         double h;

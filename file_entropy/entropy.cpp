@@ -48,12 +48,6 @@ double GetByteEntropy(const std::string& filename)
 
 int main(int argc, char* argv[])
 {
-    // Check command line arguments.
-    if (argc < 2) {
-        std::cerr << "Error, program usage: " << argv[0] << " [inputfilenames...]" << std::endl;
-        exit(1);
-    }
-
     // Loop over all the command line inputs, open each file and calculate it's entropy.
     for (int argnum = 1; argnum < argc; ++argnum) {
         const std::string filename(argv[argnum]);
