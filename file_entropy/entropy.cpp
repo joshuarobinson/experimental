@@ -10,22 +10,28 @@ const int BadFilenameException = 10;
 // Calculate entropy over the bytes in a file.
 double GetByteEntropy(const std::string& filename)
 {
-    std::ifstream in_f(filename, std::ifstream::in | std::ifstream::binary);
+    // Open the file with the pointer at the end (ate).
+    std::ifstream in_f(filename, std::ifstream::in | std::ifstream::binary | std::ifstream::ate);
 
     if (!in_f) {
         throw BadFilenameException;
     }
 
+    // Determine file size.
+    size_t fsize = in_f.tellg();
+    std::vector<char> raw_data(fsize);
+
+    // Read in file contents.
+    in_f.seekg(0, std::ios::beg);
+    in_f.read(raw_data.data(), fsize);
+    in_f.close();
+
+    // Convert to a histogram.
     std::array<int, 256> byte_counters;
     std::fill(byte_counters.begin(), byte_counters.end(), 0);
 
-    // Now calculate the p(x) probabilities of each possible byte (0-255).
-    while (in_f) {
-        uint8_t x;
-        in_f >> x;
-
-        byte_counters.at(x)++;
-    }
+    std::for_each(raw_data.begin(), raw_data.end(),
+            [&byte_counters](char x) { byte_counters.at(x)++; });
 
     int total_bytes = std::accumulate(byte_counters.begin(), byte_counters.end(), 0);
 
