@@ -7,7 +7,7 @@
 
 const int BadFilenameException = 10;
 
-// Calculate entry over the bytes in a file.
+// Calculate entropy over the bytes in a file.
 double GetByteEntropy(const std::string& filename)
 {
     std::ifstream in_f(filename, std::ifstream::in | std::ifstream::binary);
@@ -20,14 +20,14 @@ double GetByteEntropy(const std::string& filename)
     std::fill(byte_counters.begin(), byte_counters.end(), 0);
 
     // Now calculate the p(x) probabilities of each possible byte (0-255).
-    int total_bytes = 0;
     while (in_f) {
         uint8_t x;
         in_f >> x;
 
         byte_counters.at(x)++;
-        total_bytes++;
     }
+
+    int total_bytes = std::accumulate(byte_counters.begin(), byte_counters.end(), 0);
 
     double h = 0.0;  // Entropy
 
