@@ -5,6 +5,7 @@
 import qualified Data.ByteString as BS
 import Data.List
 import Data.Word
+import System.Environment
 
 -- Return a histogram as a list of bucket counts.
 -- Note that we are ignoring the bucket values.
@@ -20,8 +21,11 @@ calcEntropy [] = 0.0
 calcEntropy xs = foldl (entropyHelper total_count) 0.0 xs
     where total_count = sum xs
 
+
 main = do
-	d <- BS.readFile "Makefile"
+        args <- getArgs
+        let f = head args
+	d <- BS.readFile f
         let counts = histogram d
         let entropy = calcEntropy counts
-	putStrLn (show entropy)
+        putStrLn (f ++ " " ++ (show entropy))
